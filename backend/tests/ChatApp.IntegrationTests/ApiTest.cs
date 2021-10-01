@@ -1,13 +1,54 @@
 namespace ChatApp.IntegrationTests
 {
     using System.Net.Http;
+    using System.Threading.Tasks;
+    using ChatApp.Api.Storage;
+    using Microsoft.Extensions.Configuration;
+    using Microsoft.Extensions.DependencyInjection;
     using NUnit.Framework;
+    using Respawn;
 
     public class ApiTest
     {
+        private static readonly Checkpoint ChatAppDBReset = new()
+        {
+            TablesToIgnore = new[] { "__EFMigrations" }
+        };
+
+        protected static IServiceScope Scope { get; private set; }
+        protected static ChatAppDbContext DbContext { get; private set; }
+        
         protected HttpClient HttpClient;
 
+        protected static T GetService<T>() => Scope.ServiceProvider.GetService<T>();
+
         [SetUp]
-        public void SetUpHttpClient() => HttpClient = TestEnvironment.Factory.CreateClient();
+        public async Task SetUpScope()
+        {
+            Scope = TestEnvironment
+                .Factory
+                .Services
+                .CreateScope();
+
+            DbContext = TestEnvironment
+                .Factory
+                .Services
+                .CreateScope()
+                .ServiceProvider
+                .GetService<ChatAppDbContext>();
+
+            var configuration = (ConfigurationRoot)TestEnvironment.Factory.Services.GetService(typeof(IConfiguration));
+            var connectionString = configuration.GetConnectionString(ChatAppDbContext.DatabaseName);
+            await ChatAppDBReset.Reset(connectionString);
+            
+            HttpClient = TestEnvironment.Factory.CreateClient();
+        }
+
+        [TearDown]
+        public void TearDownScope()
+        {
+            Scope.Dispose();
+            DbContext.Dispose();
+        }
     }
 }

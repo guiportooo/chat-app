@@ -7,11 +7,14 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="FluentAssertions" Version="5.10.3" />
+    <PackageReference Include="AutoBogus" Version="2.13.1" />
+    <PackageReference Include="FluentAssertions" Version="6.1.0" />
+    <PackageReference Include="FluentAssertions.Json" Version="6.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="5.0.10" />
     <PackageReference Include="NUnit" Version="3.12.0" />
     <PackageReference Include="NUnit3TestAdapter" Version="3.16.1" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.5.0" />
+    <PackageReference Include="Respawn" Version="4.0.0" />
   </ItemGroup>
 
   <ItemGroup>
@@ -19,7 +22,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="appsettings.Development.json">
+    <Content Include="appsettings.json">
       <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
