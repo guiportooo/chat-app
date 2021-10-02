@@ -8,5 +8,6 @@ namespace ChatApp.Api.Domain.Repositories
         Task Add(User user);
         Task<User?> Get(int id);
         Task<User?> GetByUserName(string userName);
+        Task<User?> GetByUserNameAndPassword(string userName, string password);
     }
 }

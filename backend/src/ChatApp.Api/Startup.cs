@@ -19,7 +19,7 @@ namespace ChatApp.Api
                 .AddAutoMapper(typeof(Startup))
                 .AddMediatR(typeof(Startup))
                 .AddStorage(_configuration)
-                .AddHttpIn();
+                .AddHttpIn(_configuration);
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env) =>
             app

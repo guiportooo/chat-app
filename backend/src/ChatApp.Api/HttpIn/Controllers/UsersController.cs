@@ -3,6 +3,7 @@
     using System.Threading.Tasks;
     using AutoMapper;
     using MediatR;
+    using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Mvc;
     using Commands = Domain.Commands;
@@ -22,6 +23,7 @@
 
         [HttpGet]
         [Route("users/{id:int}", Name = "Get")]
+        [Authorize]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Responses.User))]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Get(int id)
@@ -46,6 +48,22 @@
             var user = await _mediator.Send(command);
             var response = _mapper.Map<Responses.User>(user);
             return CreatedAtRoute(nameof(Get), new { id = user.Id }, response);
+        }
+
+        [HttpPost]
+        [Route("authenticate")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Responses.AuthenticatedUser))]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> Authenticate([FromBody] Requests.AuthenticateUser request)
+        {
+            var command = _mapper.Map<Commands.AuthenticateUser>(request);
+            var token = await _mediator.Send(command);
+
+            if (string.IsNullOrWhiteSpace(token))
+                return NotFound();
+
+            var response = new Responses.AuthenticatedUser(request.UserName, token);
+            return Ok(response);
         }
     }
 }
