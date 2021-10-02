@@ -12,6 +12,8 @@ namespace ChatApp.Api.Storage
         }
 
         public DbSet<User> Users => Set<User>();
+        public DbSet<Room> Rooms => Set<Room>();
+        public DbSet<Message> Messages => Set<Message>();
 
         protected override void OnModelCreating(ModelBuilder builder) =>
             builder.ApplyConfigurationsFromAssembly(typeof(ChatAppDbContext).Assembly);

@@ -1,6 +1,8 @@
 namespace ChatApp.Api.Storage
 {
     using System;
+    using System.Linq;
+    using Domain.Models;
     using Domain.Repositories;
     using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.Hosting;
@@ -16,7 +18,9 @@ namespace ChatApp.Api.Storage
             services
                 .AddDbContext<ChatAppDbContext>(opt =>
                     opt.UseSqlServer(configuration.GetConnectionString(ChatAppDbContext.DatabaseName)))
-                .AddScoped<IUserRepository, UserRepository>();
+                .AddScoped<IUserRepository, UserRepository>()
+                .AddScoped<IRoomRepository, RoomRepository>()
+                .AddScoped<IMessageRepository, MessageRepository>();
 
         public static IApplicationBuilder UseStorage(this IApplicationBuilder app, IWebHostEnvironment env)
         {
@@ -30,6 +34,12 @@ namespace ChatApp.Api.Storage
                 throw new ArgumentNullException(nameof(dbContext), "Could not instantiate DbContext");
 
             dbContext.Database.Migrate();
+
+            if (dbContext.Rooms.Any())
+                return app;
+
+            dbContext.Rooms.Add(new Room("general"));
+            dbContext.SaveChanges();
             return app;
         }
     }

@@ -16,6 +16,8 @@ namespace ChatApp.Api
             CreateMap<Models.User, Responses.User>();
             CreateMap<Requests.AuthenticateUser, Commands.AuthenticateUser>();
             CreateMap<Commands.AuthenticateUser, Queries.GetUserByUserNameAndPassword>();
+            CreateMap<Models.Message, Responses.MessageSent>();
+            CreateMap<Models.Message, Responses.Message>();
         }
     }
 }

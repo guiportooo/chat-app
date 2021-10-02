@@ -22,9 +22,10 @@
         }
 
         [HttpGet]
-        [Route("users/{id:int}", Name = "Get")]
+        [Route("users/{id:int}", Name = "GetUser")]
         [Authorize]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Responses.User))]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Get(int id)
         {
@@ -47,7 +48,7 @@
             var command = _mapper.Map<Commands.RegisterUser>(request);
             var user = await _mediator.Send(command);
             var response = _mapper.Map<Responses.User>(user);
-            return CreatedAtRoute(nameof(Get), new { id = user.Id }, response);
+            return CreatedAtRoute("GetUser", new { id = user.Id }, response);
         }
 
         [HttpPost]
