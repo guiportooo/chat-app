@@ -1,6 +1,6 @@
 namespace ChatApp.StockBot
 {
-    using Amqp;
+    using MessageBroker;
     using Microsoft.Extensions.Hosting;
 
     public class Program
@@ -14,7 +14,7 @@ namespace ChatApp.StockBot
                     var configuration = hostContext.Configuration;
 
                     services
-                        .AddAmqp(configuration);
+                        .AddMessageBroker(configuration);
                 });
     }
 }

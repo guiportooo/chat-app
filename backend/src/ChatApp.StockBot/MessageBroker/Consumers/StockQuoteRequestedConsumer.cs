@@ -1,4 +1,4 @@
-namespace ChatApp.StockBot.Amqp.AmqpIn
+namespace ChatApp.StockBot.MessageBroker.Consumers
 {
     using System.Text;
     using System.Threading;

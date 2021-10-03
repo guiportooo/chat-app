@@ -1,4 +1,4 @@
-namespace ChatApp.StockBot.Amqp
+namespace ChatApp.Api.MessageBroker
 {
     public class MessageBrokerSettings
     {

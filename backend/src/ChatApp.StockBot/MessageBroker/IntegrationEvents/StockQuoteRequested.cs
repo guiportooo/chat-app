@@ -1,4 +1,4 @@
-namespace ChatApp.StockBot.Amqp.IntegrationEvents
+namespace ChatApp.StockBot.MessageBroker.IntegrationEvents
 {
     public class StockQuoteRequested
     {

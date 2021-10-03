@@ -1,14 +1,15 @@
-namespace ChatApp.Api.Amqp
+namespace ChatApp.Api.MessageBroker
 {
-    using AmqpOut;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
+    using Publishers;
 
     public static class Extensions
     {
-        public static IServiceCollection AddAmqp(this IServiceCollection services, IConfiguration configuration) =>
+        public static IServiceCollection AddMessageBroker(this IServiceCollection services,
+            IConfiguration configuration) =>
             services
                 .Configure<MessageBrokerSettings>(configuration.GetSection(MessageBrokerSettings.Name))
-                .AddAmqpOut();
+                .AddPublishers();
     }
 }

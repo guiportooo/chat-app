@@ -1,4 +1,4 @@
-namespace ChatApp.Api.Amqp.AmqpOut
+namespace ChatApp.Api.MessageBroker.Publishers
 {
     using System.Text;
     using System.Text.Json;
