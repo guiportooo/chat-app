@@ -1,11 +1,11 @@
-namespace ChatApp.Api.Middlewares
+namespace ChatApp.Api.HttpIn.Middlewares
 {
     using System.Net;
     using System.Text.Json;
     using System.Threading.Tasks;
     using Domain.Exceptions;
-    using HttpIn.Responses;
     using Microsoft.AspNetCore.Http;
+    using Responses;
 
     public class DomainExceptionMiddleware
     {

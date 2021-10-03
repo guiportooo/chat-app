@@ -27,9 +27,9 @@ namespace ChatApp.Api.Domain.Commands
             _logger = logger;
         }
 
-        public async Task<string> Handle(AuthenticateUser request, CancellationToken cancellationToken)
+        public async Task<string> Handle(AuthenticateUser command, CancellationToken cancellationToken)
         {
-            var query = _mapper.Map<Queries.GetUserByUserNameAndPassword>(request);
+            var query = _mapper.Map<Queries.GetUserByUserNameAndPassword>(command);
             var user = await _mediator.Send(query, cancellationToken);
 
             if (user is null)

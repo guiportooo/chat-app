@@ -1,5 +1,7 @@
 namespace ChatApp.Api
 {
+    using Amqp;
+    using Domain.Services;
     using HttpIn;
     using MediatR;
     using Microsoft.AspNetCore.Builder;
@@ -18,7 +20,9 @@ namespace ChatApp.Api
             services
                 .AddAutoMapper(typeof(Startup))
                 .AddMediatR(typeof(Startup))
+                .AddDomainServices()
                 .AddStorage(_configuration)
+                .AddAmqp(_configuration)
                 .AddHttpIn(_configuration);
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env) =>

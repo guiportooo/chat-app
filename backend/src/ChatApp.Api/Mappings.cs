@@ -6,6 +6,7 @@ namespace ChatApp.Api
     using Commands = Domain.Commands;
     using Queries = Domain.Queries;
     using Models = Domain.Models;
+    using Events = Domain.Events;
 
     public class Mappings : Profile
     {
@@ -18,6 +19,7 @@ namespace ChatApp.Api
             CreateMap<Commands.AuthenticateUser, Queries.GetUserByUserNameAndPassword>();
             CreateMap<Models.Message, Responses.MessageSent>();
             CreateMap<Models.Message, Responses.Message>();
+            CreateMap<Models.Message, Events.MessageSent>();
         }
     }
 }

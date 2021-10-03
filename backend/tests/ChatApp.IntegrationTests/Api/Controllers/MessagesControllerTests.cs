@@ -85,6 +85,7 @@ namespace ChatApp.IntegrationTests.Api.Controllers
 
             var room = new AutoFaker<Models.Room>()
                 .RuleFor(x => x.Id, () => 0)
+                .RuleFor(x => x.Code, () => "general")
                 .RuleFor(x => x.Messages, () => new List<Models.Message>())
                 .Generate();
 
@@ -117,6 +118,37 @@ namespace ChatApp.IntegrationTests.Api.Controllers
             responseContent.Should().BeEquivalentTo(expectedContent);
             response.Headers.Location?.AbsoluteUri.Should()
                 .Be($"http://localhost/rooms/{room.Code}/Messages/{messageSent.Id}");
+        }
+
+        [Test, Category("SendMessage")]
+        public async Task Should_send_stock_command()
+        {
+            var user = new AutoFaker<Models.User>()
+                .RuleFor(x => x.Id, () => 0)
+                .Generate();
+
+            var room = new AutoFaker<Models.Room>()
+                .RuleFor(x => x.Id, () => 0)
+                .RuleFor(x => x.Code, () => "general")
+                .RuleFor(x => x.Messages, () => new List<Models.Message>())
+                .Generate();
+
+            DbContext.Users.Add(user);
+            DbContext.Rooms.Add(room);
+            await DbContext.SaveChangesAsync();
+
+            var request = new AutoFaker<Requests.SendMessage>()
+                .RuleFor(x => x.Text, () => "/stock=AAPL.US")
+                .Generate();
+
+            var requestContent = new StringContent(JsonSerializer.Serialize(request),
+                Encoding.UTF8,
+                "application/json");
+
+            AuthorizeHttpClient(user);
+            var response = await HttpClient.PostAsync($"rooms/{room.Code}/messages", requestContent);
+
+            response.StatusCode.Should().Be(HttpStatusCode.NoContent);
         }
 
         [Test, Category("GetMessages")]
@@ -161,7 +193,7 @@ namespace ChatApp.IntegrationTests.Api.Controllers
             var user = new AutoFaker<Models.User>()
                 .RuleFor(x => x.Id, () => 0)
                 .Generate();
-            
+
             var messages = new AutoFaker<Models.Message>()
                 .RuleFor(x => x.Id, () => 0)
                 .RuleFor(x => x.RoomId, () => 0)

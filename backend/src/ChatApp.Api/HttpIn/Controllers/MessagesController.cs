@@ -70,6 +70,10 @@ namespace ChatApp.Api.HttpIn.Controllers
 
             var command = new Commands.SendMessage(roomCode, userName, request.Text);
             var message = await _mediator.Send(command);
+
+            if (message is null)
+                return NoContent();
+            
             var response = _mapper.Map<Responses.MessageSent>(message, opt =>
                 opt.AfterMap((_, dest) =>
                 {
