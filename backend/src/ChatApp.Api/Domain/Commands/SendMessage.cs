@@ -2,7 +2,6 @@ namespace ChatApp.Api.Domain.Commands
 {
     using System.Threading;
     using System.Threading.Tasks;
-    using AutoMapper;
     using Events;
     using Exceptions;
     using MediatR;

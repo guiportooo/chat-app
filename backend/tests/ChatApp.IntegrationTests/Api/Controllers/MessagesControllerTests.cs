@@ -148,7 +148,7 @@ namespace ChatApp.IntegrationTests.Api.Controllers
             AuthorizeHttpClient(user);
             var response = await HttpClient.PostAsync($"rooms/{room.Code}/messages", requestContent);
 
-            response.StatusCode.Should().Be(HttpStatusCode.NoContent);
+            response.StatusCode.Should().Be(HttpStatusCode.Accepted);
         }
 
         [Test, Category("GetMessages")]

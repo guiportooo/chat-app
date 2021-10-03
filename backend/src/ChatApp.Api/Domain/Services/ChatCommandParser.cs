@@ -1,6 +1,5 @@
 namespace ChatApp.Api.Domain.Services
 {
-    using System.Linq;
     using System.Text.RegularExpressions;
 
     public interface IChatCommandParser

@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk.Worker">
+
+    <PropertyGroup>
+        <TargetFramework>net5.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <UserSecretsId>dotnet-ChatApp.Commands-B73C1B37-AC80-4E9A-88D6-95BDD326D4B8</UserSecretsId>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.Extensions.Hosting" Version="5.0.0" />
+        <PackageReference Include="RabbitMQ.Client" Version="6.2.2" />
+    </ItemGroup>
+</Project>

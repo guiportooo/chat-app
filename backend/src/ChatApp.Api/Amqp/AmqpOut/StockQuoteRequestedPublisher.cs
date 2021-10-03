@@ -18,8 +18,8 @@ namespace ChatApp.Api.Amqp.AmqpOut
         public StockQuoteRequestedPublisher(IOptions<MessageBrokerSettings> settings,
             ILogger<StockQuoteRequestedPublisher> logger)
         {
-            _logger = logger;
             _settings = settings.Value;
+            _logger = logger;
             var factory = new ConnectionFactory { HostName = _settings.Host, Port = _settings.Port };
             _connection = factory.CreateConnection();
             _channel = _connection.CreateModel();

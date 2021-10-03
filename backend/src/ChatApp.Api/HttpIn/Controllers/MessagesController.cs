@@ -59,6 +59,7 @@ namespace ChatApp.Api.HttpIn.Controllers
 
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(Responses.MessageSent))]
+        [ProducesResponseType(StatusCodes.Status202Accepted)]
         [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(Responses.Error))]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<IActionResult> Post(string roomCode, [FromBody] Requests.SendMessage request)
@@ -72,8 +73,8 @@ namespace ChatApp.Api.HttpIn.Controllers
             var message = await _mediator.Send(command);
 
             if (message is null)
-                return NoContent();
-            
+                return Accepted();
+
             var response = _mapper.Map<Responses.MessageSent>(message, opt =>
                 opt.AfterMap((_, dest) =>
                 {
