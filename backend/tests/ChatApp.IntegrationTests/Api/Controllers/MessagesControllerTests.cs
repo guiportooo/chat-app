@@ -1,7 +1,7 @@
 namespace ChatApp.IntegrationTests.Api.Controllers
 {
     using System.Collections.Generic;
-    using System.Globalization;
+    using System.Linq;
     using System.Net;
     using System.Net.Http;
     using System.Text;
@@ -13,12 +13,13 @@ namespace ChatApp.IntegrationTests.Api.Controllers
     using Newtonsoft.Json.Linq;
     using NUnit.Framework;
     using Requests = ChatApp.Api.HttpIn.Requests;
+    using Responses = ChatApp.Api.HttpIn.Responses;
     using Models = ChatApp.Api.Domain.Models;
 
     public class MessagesControllerTests : ApiTest
     {
         [Test, Category("SendMessage")]
-        public async Task Should_return_bad_request_when_room_with_code_does_not_exist()
+        public async Task Should_return_bad_request_when_room_with_code_to_send_message_does_not_exist()
         {
             const string roomCode = "ghost-room";
             var errorMessage = $"Room {roomCode} does not exist";
@@ -116,6 +117,83 @@ namespace ChatApp.IntegrationTests.Api.Controllers
             responseContent.Should().BeEquivalentTo(expectedContent);
             response.Headers.Location?.AbsoluteUri.Should()
                 .Be($"http://localhost/rooms/{room.Code}/Messages/{messageSent.Id}");
+        }
+
+        [Test, Category("GetMessages")]
+        public async Task Should_return_bad_request_when_room_with_code_to_get_messages_from_does_not_exist()
+        {
+            const string roomCode = "ghost-room";
+            var errorMessage = $"Room {roomCode} does not exist";
+
+            AuthorizeHttpClient();
+            var response = await HttpClient.GetAsync($"rooms/{roomCode}/messages");
+
+            var responseContent = JToken.Parse(await response.Content.ReadAsStringAsync());
+            var expectedContent = JToken.Parse($@"
+            {{
+                'message': '{errorMessage}' 
+            }}");
+
+            response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+            responseContent.Should().BeEquivalentTo(expectedContent);
+        }
+
+        [Test, Category("GetMessages")]
+        public async Task Should_return_no_content_when_room_with_code_does_not_have_messages()
+        {
+            var room = new AutoFaker<Models.Room>()
+                .RuleFor(x => x.Id, () => 0)
+                .RuleFor(x => x.Messages, () => new List<Models.Message>())
+                .Generate();
+
+            DbContext.Rooms.Add(room);
+            await DbContext.SaveChangesAsync();
+
+            AuthorizeHttpClient();
+            var response = await HttpClient.GetAsync($"rooms/{room.Code}/messages");
+
+            response.StatusCode.Should().Be(HttpStatusCode.NoContent);
+        }
+
+        [Test, Category("GetMessages")]
+        public async Task Should_return_last_fifty_messages_from_room_with_code()
+        {
+            var user = new AutoFaker<Models.User>()
+                .RuleFor(x => x.Id, () => 0)
+                .Generate();
+            
+            var messages = new AutoFaker<Models.Message>()
+                .RuleFor(x => x.Id, () => 0)
+                .RuleFor(x => x.RoomId, () => 0)
+                .RuleFor(x => x.Room, () => null)
+                .RuleFor(x => x.UserId, () => user.Id)
+                .RuleFor(x => x.User, () => user)
+                .Generate(51);
+
+            var room = new AutoFaker<Models.Room>()
+                .RuleFor(x => x.Id, () => 0)
+                .RuleFor(x => x.Messages, () => messages)
+                .Generate();
+
+            DbContext.Rooms.Add(room);
+            await DbContext.SaveChangesAsync();
+
+            AuthorizeHttpClient();
+            var response = await HttpClient.GetAsync($"rooms/{room.Code}/messages");
+
+            var responseContent = await response.Content.ReadAsStringAsync();
+
+            var receivedMessages =
+                JsonSerializer.Deserialize<Responses.MessagesSent>(responseContent, new JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true
+                });
+
+            var messageToExclude = messages.OrderBy(x => x.Timestamp).First();
+
+            response.StatusCode.Should().Be(HttpStatusCode.OK);
+            receivedMessages?.Messages.Count().Should().Be(50);
+            receivedMessages?.Messages.Any(x => x.Id == messageToExclude.Id).Should().BeFalse();
         }
     }
 }

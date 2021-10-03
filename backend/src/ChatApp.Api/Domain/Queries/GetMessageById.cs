@@ -3,7 +3,6 @@ namespace ChatApp.Api.Domain.Queries
     using System.Threading;
     using System.Threading.Tasks;
     using MediatR;
-    using Microsoft.EntityFrameworkCore;
     using Models;
     using Repositories;
 

@@ -1,5 +1,6 @@
 namespace ChatApp.Api.HttpIn.Controllers
 {
+    using System.Linq;
     using System.Threading.Tasks;
     using AutoMapper;
     using Domain.Queries;
@@ -36,6 +37,23 @@ namespace ChatApp.Api.HttpIn.Controllers
                 return NotFound();
 
             var response = _mapper.Map<Responses.Message>(message);
+            return Ok(response);
+        }
+
+        [HttpGet]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Responses.MessageSent))]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> Get(string roomCode)
+        {
+            var query = new GetLastFiftyMessagesByRoom(roomCode);
+            var messages = await _mediator.Send(query);
+
+            if (!messages.Any())
+                return NoContent();
+
+            var response = new Responses.MessagesSent(messages);
             return Ok(response);
         }
 
