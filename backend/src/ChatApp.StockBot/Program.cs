@@ -1,7 +1,9 @@
 namespace ChatApp.StockBot
 {
+    using HttpOut;
     using MessageBroker;
     using Microsoft.Extensions.Hosting;
+    using Services;
 
     public class Program
     {
@@ -14,7 +16,9 @@ namespace ChatApp.StockBot
                     var configuration = hostContext.Configuration;
 
                     services
-                        .AddMessageBroker(configuration);
+                        .AddMessageBroker(configuration)
+                        .AddHttpOut(configuration)
+                        .AddBotServices();
                 });
     }
 }

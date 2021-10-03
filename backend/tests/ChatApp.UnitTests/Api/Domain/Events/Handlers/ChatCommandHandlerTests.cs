@@ -45,7 +45,7 @@ namespace ChatApp.UnitTests.Api.Domain.Events.Handlers
         }
 
         [Test]
-        public async Task Should_throw_exception_when_command_is_invalid()
+        public void Should_throw_exception_when_command_is_invalid()
         {
             var messageSent = new AutoFaker<MessageSent>().Generate();
 

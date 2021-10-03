@@ -1,6 +1,7 @@
 namespace ChatApp.StockBot.MessageBroker.Consumers
 {
     using System.Text;
+    using System.Text.Json;
     using System.Threading;
     using System.Threading.Tasks;
     using IntegrationEvents;
@@ -9,6 +10,7 @@ namespace ChatApp.StockBot.MessageBroker.Consumers
     using Microsoft.Extensions.Options;
     using RabbitMQ.Client;
     using RabbitMQ.Client.Events;
+    using Services;
 
     public class StockQuoteRequestedConsumer : BackgroundService
     {
@@ -16,12 +18,15 @@ namespace ChatApp.StockBot.MessageBroker.Consumers
         private readonly IConnection _connection;
         private readonly IModel _channel;
         private readonly string _queueName;
+        private readonly IStockQuoteService _service;
         private readonly ILogger<StockQuoteRequestedConsumer> _logger;
 
         public StockQuoteRequestedConsumer(IOptions<MessageBrokerSettings> settings,
+            IStockQuoteService service,
             ILogger<StockQuoteRequestedConsumer> logger)
         {
             _settings = settings.Value;
+            _service = service;
             _logger = logger;
             var factory = new ConnectionFactory { HostName = _settings.Host, Port = _settings.Port };
             _connection = factory.CreateConnection();
@@ -44,6 +49,8 @@ namespace ChatApp.StockBot.MessageBroker.Consumers
                 var body = eventArgs.Body;
                 var message = Encoding.UTF8.GetString(body.ToArray());
                 _logger.LogInformation("Stock quote request consumed: {Message}", message);
+                var stockQuoteRequested = JsonSerializer.Deserialize<StockQuoteRequested>(message);
+                _service.SendStockQuote(stockQuoteRequested);
             };
 
             _channel.BasicConsume(queue: _queueName, autoAck: true, consumer: consumer);
