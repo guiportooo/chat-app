@@ -1,5 +1,6 @@
 namespace ChatApp.StockBot.HttpOut
 {
+    using System;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
 
@@ -8,6 +9,10 @@ namespace ChatApp.StockBot.HttpOut
         public static IServiceCollection AddHttpOut(this IServiceCollection services, IConfiguration configuration) =>
             services
                 .Configure<StooqHttpClientSettings>(configuration.GetSection(StooqHttpClientSettings.Name))
-                .AddSingleton<IStooqHttpClient, StooqHttpClient>();
+                .AddHttpClient<IStooqHttpClient, StooqHttpClient>(client =>
+                    client.BaseAddress = new Uri(configuration
+                        .GetSection("StooqHttpClient")
+                        .GetValue<string>("Host")))
+                .Services;
     }
 }

@@ -1,5 +1,8 @@
 namespace ChatApp.StockBot.HttpOut
 {
+    using System.IO;
+    using System.Net.Http;
+    using System.Text;
     using System.Threading.Tasks;
 
     public interface IStooqHttpClient
@@ -9,8 +12,19 @@ namespace ChatApp.StockBot.HttpOut
 
     public class StooqHttpClient : IStooqHttpClient
     {
-        public Task<string> GetStockQuote(string stockCode) =>
-            Task.FromResult(
-                $"Symbol,Date,Time,Open,High,Low,Close,Volume\r\n{stockCode},2021-10-01,22:00:18,141.9,142.92,139.1101,142.65,94639581");
+        private readonly HttpClient _client;
+
+        public StooqHttpClient(HttpClient client) => _client = client;
+
+        public async Task<string> GetStockQuote(string stockCode)
+        {
+            var response = await _client.GetAsync($"q/l/?s={stockCode.ToLower()}&f=sd2t2ohlcv&h&e=csv");
+
+            if (!response.IsSuccessStatusCode)
+                return string.Empty;
+
+            var byteArray = await response.Content.ReadAsByteArrayAsync();
+            return Encoding.UTF8.GetString(byteArray, 0, byteArray.Length);
+        }
     }
 }
