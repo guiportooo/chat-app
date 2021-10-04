@@ -1,13 +1,12 @@
-namespace ChatApp.UnitTests.Api.Domain.Events.Handlers
+namespace ChatApp.UnitTests.Api.Domain.EventHandlers.StockBot
 {
     using System;
     using System.Threading;
     using System.Threading.Tasks;
     using AutoBogus;
+    using ChatApp.Api.Domain.EventHandlers.StockBot;
     using ChatApp.Api.Domain.Events;
-    using ChatApp.Api.Domain.Events.Handlers;
     using ChatApp.Api.Domain.Exceptions;
-    using ChatApp.Api.Domain.IntegrationEvents;
     using ChatApp.Api.Domain.IntegrationEvents.Publishers;
     using ChatApp.Api.Domain.Services;
     using FluentAssertions;
@@ -15,16 +14,16 @@ namespace ChatApp.UnitTests.Api.Domain.Events.Handlers
     using Moq.AutoMock;
     using NUnit.Framework;
 
-    public class ChatCommandHandlerTests
+    public class MessageSentHandlerTests
     {
         private AutoMocker _mocker;
-        private ChatCommandHandler _handler;
+        private MessageSentHandler _handler;
 
         [SetUp]
         public void Setup()
         {
             _mocker = new AutoMocker();
-            _handler = _mocker.CreateInstance<ChatCommandHandler>();
+            _handler = _mocker.CreateInstance<MessageSentHandler>();
         }
 
         [Test]

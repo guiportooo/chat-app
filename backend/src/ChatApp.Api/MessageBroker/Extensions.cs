@@ -1,5 +1,6 @@
 namespace ChatApp.Api.MessageBroker
 {
+    using Consumers;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
     using Publishers;
@@ -10,6 +11,7 @@ namespace ChatApp.Api.MessageBroker
             IConfiguration configuration) =>
             services
                 .Configure<MessageBrokerSettings>(configuration.GetSection(MessageBrokerSettings.Name))
-                .AddPublishers();
+                .AddPublishers()
+                .AddConsumers();
     }
 }

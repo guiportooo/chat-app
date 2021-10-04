@@ -1,20 +1,19 @@
-namespace ChatApp.Api.Domain.Events.Handlers
+namespace ChatApp.Api.Domain.EventHandlers.StockBot
 {
     using System.Threading;
     using System.Threading.Tasks;
     using Events;
     using Exceptions;
-    using IntegrationEvents;
     using IntegrationEvents.Publishers;
     using MediatR;
     using Services;
 
-    public class ChatCommandHandler : INotificationHandler<MessageSent>
+    public class MessageSentHandler : INotificationHandler<MessageSent>
     {
         private readonly IChatCommandParser _commandParser;
         private readonly IStockQuoteRequestedPublisher _publisher;
 
-        public ChatCommandHandler(IChatCommandParser commandParser, IStockQuoteRequestedPublisher publisher)
+        public MessageSentHandler(IChatCommandParser commandParser, IStockQuoteRequestedPublisher publisher)
         {
             _commandParser = commandParser;
             _publisher = publisher;

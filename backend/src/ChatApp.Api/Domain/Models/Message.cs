@@ -12,6 +12,16 @@ namespace ChatApp.Api.Domain.Models
             UserId = userId;
         }
 
+        public Message(string text, Room room, User user)
+        {
+            Timestamp = DateTime.UtcNow;
+            Text = text;
+            RoomId = room.Id;
+
+            if (user.IsBot) User = user;
+            else UserId = user.Id;
+        }
+
         public int Id { get; private set; }
         public string Text { get; private set; }
         public DateTime Timestamp { get; private set; }

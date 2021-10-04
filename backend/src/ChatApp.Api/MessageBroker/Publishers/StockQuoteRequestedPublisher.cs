@@ -2,7 +2,6 @@ namespace ChatApp.Api.MessageBroker.Publishers
 {
     using System.Text;
     using System.Text.Json;
-    using Domain.IntegrationEvents;
     using Domain.IntegrationEvents.Publishers;
     using Microsoft.Extensions.Logging;
     using Microsoft.Extensions.Options;

@@ -11,5 +11,6 @@ namespace ChatApp.Api.Domain.Models
         public int Id { get; private set; }
         public string UserName { get; private set; }
         public string Password { get; private set; }
+        public virtual bool IsBot => false;
     }
 }

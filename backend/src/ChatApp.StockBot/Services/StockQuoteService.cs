@@ -5,7 +5,6 @@ namespace ChatApp.StockBot.Services
     using MessageBroker.Consumers.IntegrationEvents;
     using MessageBroker.Publishers;
     using MessageBroker.Publishers.IntegrationEvents;
-    using Microsoft.Extensions.Logging;
 
     public interface IStockQuoteService
     {

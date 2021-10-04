@@ -7,6 +7,7 @@ namespace ChatApp.Api.Domain.Commands
     using MediatR;
     using Microsoft.Extensions.Logging;
     using Models;
+    using Queries;
     using Repositories;
     using Services;
 
@@ -19,48 +20,57 @@ namespace ChatApp.Api.Domain.Commands
         private readonly IMessageRepository _messageRepository;
         private readonly IChatCommandParser _commandParser;
         private readonly IMediator _mediator;
-        private readonly ILogger<SendMessageHandler> _logger;
 
         public SendMessageHandler(IUserRepository userRepository,
             IRoomRepository roomRepository,
             IMessageRepository messageRepository,
             IChatCommandParser commandParser,
-            IMediator mediator,
-            ILogger<SendMessageHandler> logger)
+            IMediator mediator)
         {
             _userRepository = userRepository;
             _roomRepository = roomRepository;
             _messageRepository = messageRepository;
             _commandParser = commandParser;
             _mediator = mediator;
-            _logger = logger;
         }
 
         public async Task<Message?> Handle(SendMessage command, CancellationToken cancellationToken)
         {
             var (roomCode, userName, text) = command;
+            var room = await GetRoom(roomCode);
+            var user = await GetUser(userName);
+            var message = new Message(text, room, user);
+            var @event = new MessageSent(message.Text, message.Timestamp, userName, roomCode);
+            await _mediator.Publish(@event, cancellationToken);
+
+            if (_commandParser.IsCommand(text) || user.IsBot)
+                return null;
+
+            await _messageRepository.Add(message);
+            return message;
+        }
+
+        private async Task<Room> GetRoom(string roomCode)
+        {
             var room = await _roomRepository.GetByCode(roomCode);
 
             if (room is null)
                 throw new RoomNotFoundException(roomCode);
+
+            return room;
+        }
+
+        private async Task<User> GetUser(string userName)
+        {
+            if (userName == StockBotUser.BotUserName)
+                return new StockBotUser();
 
             var user = await _userRepository.GetByUserName(userName);
 
             if (user is null)
                 throw new UserNotFoundException(userName);
 
-            var message = new Message(text, room.Id, user.Id);
-
-            var @event = new MessageSent(message.Text, message.Timestamp, userName, roomCode);
-            await _mediator.Publish(@event, cancellationToken);
-            _logger.LogInformation("Message '{Text}' sent from {UserName} to room {RoomCode}",
-                text, userName, roomCode);
-            
-            if (_commandParser.IsCommand(text))
-                return null;
-            
-            await _messageRepository.Add(message);
-            return message;
+            return user;
         }
     }
 }

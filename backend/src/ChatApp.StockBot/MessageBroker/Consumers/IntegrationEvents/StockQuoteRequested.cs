@@ -1,6 +1,6 @@
 namespace ChatApp.StockBot.MessageBroker.Consumers.IntegrationEvents
 {
-    public class StockQuoteRequested
+    public class StockQuoteRequested : IntegrationEvent
     {
         public StockQuoteRequested(string stockCode, string roomCode)
         {

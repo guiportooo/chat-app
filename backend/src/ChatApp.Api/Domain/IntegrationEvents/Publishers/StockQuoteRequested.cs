@@ -1,4 +1,4 @@
-namespace ChatApp.Api.Domain.IntegrationEvents
+namespace ChatApp.Api.Domain.IntegrationEvents.Publishers
 {
     public class StockQuoteRequested : IntegrationEvent
     {

@@ -1,9 +1,7 @@
 namespace ChatApp.StockBot.Services
 {
     using System;
-    using System.IO;
     using System.Linq;
-    using System.Text;
     using Models;
     using TinyCsvParser;
     using TinyCsvParser.Mapping;
