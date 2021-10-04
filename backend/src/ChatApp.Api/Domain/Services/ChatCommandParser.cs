@@ -18,9 +18,7 @@ namespace ChatApp.Api.Domain.Services
                 return ("", "");
 
             var index = text.IndexOf('=');
-            var command = text.Length - index - 2;
-            var value = text.Length - index - 1;
-            return (text[..command], text[^value..]);
+            return (text[..index], text[^(text.Length - index - 1)..]);
         }
     }
 }

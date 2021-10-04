@@ -22,6 +22,9 @@ namespace ChatApp.UnitTests.Api.Domain.Services
         [TestCase("/stock=APPL.US", "/stock", "APPL.US")]
         [TestCase("/stock=APPL=US", "/stock", "APPL=US")]
         [TestCase("/stock=APPL/US", "/stock", "APPL/US")]
+        [TestCase("/stock=APPL.USY", "/stock", "APPL.USY")]
+        [TestCase("/stock=APPLUS", "/stock", "APPLUS")]
+        [TestCase("/stock=APPLU", "/stock", "APPLU")]
         [TestCase("stock=APPL.US", "", "")]
         [TestCase("/stock>APPL.US", "", "")]
         public void Should_parse_valid_command(string text, string command, string value) =>
