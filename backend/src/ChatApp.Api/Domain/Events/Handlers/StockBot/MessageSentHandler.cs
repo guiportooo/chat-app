@@ -1,4 +1,4 @@
-namespace ChatApp.Api.Domain.EventHandlers.StockBot
+namespace ChatApp.Api.Domain.Events.Handlers.StockBot
 {
     using System.Threading;
     using System.Threading.Tasks;
