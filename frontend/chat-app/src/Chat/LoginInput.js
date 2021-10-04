@@ -4,7 +4,7 @@ const LoginInput = (props) => {
   const [user, setUser] = useState('')
   const [password, setPassword] = useState('')
 
-  const onSubmit = (e) => {
+  const onLogin = (e) => {
     e.preventDefault()
 
     const isUserProvided = user && user !== ''
@@ -17,12 +17,25 @@ const LoginInput = (props) => {
     }
   }
 
+  const onRegister = (e) => {
+    e.preventDefault()
+
+    const isUserProvided = user && user !== ''
+    const isPasswordProvided = password && password !== ''
+
+    if (isUserProvided && isPasswordProvided) {
+      props.register(user, password)
+    } else {
+      alert('Please insert an user and a password.')
+    }
+  }
+
   const onUserUpdate = (e) => setUser(e.target.value)
 
   const onPasswordUpdate = (e) => setPassword(e.target.value)
 
   return (
-    <form onSubmit={onSubmit}>
+    <form>
       <label htmlFor='user'>User:</label>
       <br />
       <input
@@ -44,7 +57,8 @@ const LoginInput = (props) => {
       />
       <br />
       <br />
-      <button>LogIn</button>
+      <button onClick={onLogin}>LogIn</button>
+      <button onClick={onRegister}>Register</button>
     </form>
   )
 }

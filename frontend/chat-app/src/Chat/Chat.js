@@ -54,6 +54,24 @@ const Chat = () => {
     }
   }
 
+  const register = async (userName, password) => {
+    const registerUser = {
+      userName: userName,
+      password: password,
+    }
+
+    try {
+      await fetch('https://localhost:5001/register', {
+        method: 'POST',
+        body: JSON.stringify(registerUser),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+    } catch (e) {
+      console.log('Registering failed.', e)
+    }
+  }
   const sendMessage = async (message) => {
     const chatMessage = {
       text: message,
@@ -86,7 +104,7 @@ const Chat = () => {
           <ChatWindow chat={chat} />
         </div>
       ) : (
-        <LoginInput logIn={logIn} />
+        <LoginInput logIn={logIn} register={register} />
       )}
     </div>
   )
