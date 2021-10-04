@@ -6,7 +6,7 @@ namespace ChatApp.IntegrationTests
     using System.Threading.Tasks;
     using AutoBogus;
     using ChatApp.Api.Domain.Models;
-    using ChatApp.Api.HttpIn.Authentication;
+    using ChatApp.Api.Domain.Services;
     using ChatApp.Api.Storage;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;

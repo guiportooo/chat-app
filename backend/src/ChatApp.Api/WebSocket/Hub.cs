@@ -1,24 +1,23 @@
 namespace ChatApp.Api.WebSocket
 {
-    using System.Threading;
     using System.Threading.Tasks;
     using Domain.Events;
-    using MediatR;
+    using Domain.IntegrationEvents.Hub;
     using Microsoft.AspNetCore.SignalR;
     using Microsoft.Extensions.Logging;
 
-    public class MessageSentHandler : INotificationHandler<MessageSent>
+    public class Hub : IHub
     {
         private readonly IHubContext<ChatHub, IChatClient> _chatHub;
-        private readonly ILogger<MessageSentHandler> _logger;
+        private readonly ILogger<Hub> _logger;
 
-        public MessageSentHandler(IHubContext<ChatHub, IChatClient> chatHub, ILogger<MessageSentHandler> logger)
+        public Hub(IHubContext<ChatHub, IChatClient> chatHub, ILogger<Hub> logger)
         {
             _chatHub = chatHub;
             _logger = logger;
         }
 
-        public async Task Handle(MessageSent message, CancellationToken cancellationToken)
+        public async Task Send(MessageSent message)
         {
             _logger.LogInformation("Sending message to hub: {Message}", message);
             await _chatHub.Clients.All.ReceiveMessage(message);

@@ -2,7 +2,6 @@ namespace ChatApp.Api.Domain.Commands
 {
     using System.Threading;
     using System.Threading.Tasks;
-    using HttpIn.Authentication;
     using MediatR;
     using Microsoft.Extensions.Logging;
     using Repositories;

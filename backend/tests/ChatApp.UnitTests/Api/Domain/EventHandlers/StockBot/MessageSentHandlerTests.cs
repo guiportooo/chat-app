@@ -1,12 +1,10 @@
 namespace ChatApp.UnitTests.Api.Domain.EventHandlers.StockBot
 {
-    using System;
     using System.Threading;
     using System.Threading.Tasks;
     using AutoBogus;
     using ChatApp.Api.Domain.Events;
     using ChatApp.Api.Domain.Events.Handlers.StockBot;
-    using ChatApp.Api.Domain.Exceptions;
     using ChatApp.Api.Domain.IntegrationEvents.Publishers;
     using ChatApp.Api.Domain.Services;
     using FluentAssertions;

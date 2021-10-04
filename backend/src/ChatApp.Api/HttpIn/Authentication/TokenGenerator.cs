@@ -5,13 +5,9 @@ namespace ChatApp.Api.HttpIn.Authentication
     using System.Security.Claims;
     using System.Text;
     using Domain.Models;
+    using Domain.Services;
     using Microsoft.Extensions.Options;
     using Microsoft.IdentityModel.Tokens;
-
-    public interface ITokenGenerator
-    {
-        string Generate(User user);
-    }
 
     public class TokenGenerator : ITokenGenerator
     {

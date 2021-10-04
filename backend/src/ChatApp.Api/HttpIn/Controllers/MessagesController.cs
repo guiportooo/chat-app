@@ -3,12 +3,12 @@ namespace ChatApp.Api.HttpIn.Controllers
     using System.Linq;
     using System.Threading.Tasks;
     using AutoMapper;
-    using Domain.Queries;
     using MediatR;
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Mvc;
     using Commands = Domain.Commands;
+    using Queries = Domain.Queries;
 
     [ApiController]
     [Authorize]
@@ -30,7 +30,7 @@ namespace ChatApp.Api.HttpIn.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Get(string roomCode, int id)
         {
-            var query = new GetMessageById(id);
+            var query = new Queries.GetMessageById(id);
             var message = await _mediator.Send(query);
 
             if (message is null)
@@ -47,7 +47,7 @@ namespace ChatApp.Api.HttpIn.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> Get(string roomCode)
         {
-            var query = new GetLastFiftyMessagesByRoom(roomCode);
+            var query = new Queries.GetLastFiftyMessagesByRoom(roomCode);
             var messages = await _mediator.Send(query);
 
             if (!messages.Any())
