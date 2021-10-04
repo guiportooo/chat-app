@@ -7,7 +7,7 @@ namespace ChatApp.Api.Domain.Models
     {
         public Message(string text, int roomId, int userId)
         {
-            Timestamp = DateTime.UtcNow;
+            Timestamp = DateTime.Now;
             Text = text;
             RoomId = roomId;
             UserId = userId;
@@ -15,7 +15,7 @@ namespace ChatApp.Api.Domain.Models
 
         public Message(string text, Room room, User user)
         {
-            Timestamp = DateTime.UtcNow;
+            Timestamp = DateTime.Now;
             Text = text;
             Room = room;
             User = user;

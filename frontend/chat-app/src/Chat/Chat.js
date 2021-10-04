@@ -110,17 +110,14 @@ const Chat = () => {
     }
 
     try {
-      const response = await fetch(
-        'https://localhost:5001/rooms/general/messages',
-        {
-          method: 'POST',
-          body: JSON.stringify(chatMessage),
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      )
+      await fetch('https://localhost:5001/rooms/general/messages', {
+        method: 'POST',
+        body: JSON.stringify(chatMessage),
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+      })
     } catch (e) {
       console.log('Sending message failed.', e)
     }

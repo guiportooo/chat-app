@@ -20,7 +20,7 @@ namespace ChatApp.UnitTests.Api.Domain.Models
             message.Text.Should().Be(text);
             message.RoomId.Should().Be(roomId);
             message.UserId.Should().Be(userId);
-            message.Timestamp.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(2));
+            message.Timestamp.Should().BeCloseTo(DateTime.Now, TimeSpan.FromSeconds(2));
         }
 
         [Test]
@@ -35,7 +35,7 @@ namespace ChatApp.UnitTests.Api.Domain.Models
             message.Text.Should().Be(text);
             message.User.Should().BeEquivalentTo(user);
             message.Room.Should().BeEquivalentTo(room);
-            message.Timestamp.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(2));
+            message.Timestamp.Should().BeCloseTo(DateTime.Now, TimeSpan.FromSeconds(2));
         }
 
         [TestCase("/stock=APPL.US", false)]
