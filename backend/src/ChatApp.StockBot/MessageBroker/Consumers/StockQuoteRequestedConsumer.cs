@@ -4,7 +4,7 @@ namespace ChatApp.StockBot.MessageBroker.Consumers
     using System.Text.Json;
     using System.Threading;
     using System.Threading.Tasks;
-    using IntegrationEvents;
+    using IntegrationEvents.Consumers;
     using Microsoft.Extensions.Hosting;
     using Microsoft.Extensions.Logging;
     using Microsoft.Extensions.Options;

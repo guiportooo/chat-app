@@ -4,18 +4,15 @@ namespace ChatApp.Api.MessageBroker.Consumers
     using System.Text.Json;
     using System.Threading;
     using System.Threading.Tasks;
-    using AutoMapper;
-    using Domain.Commands;
     using Domain.IntegrationEvents.Consumers;
-    using Domain.IntegrationEvents.Publishers;
     using Domain.Services;
-    using MediatR;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Hosting;
     using Microsoft.Extensions.Logging;
     using Microsoft.Extensions.Options;
     using RabbitMQ.Client;
     using RabbitMQ.Client.Events;
+    using Services;
 
     public class StockQuoteRespondedConsumer : BackgroundService
     {
@@ -23,15 +20,15 @@ namespace ChatApp.Api.MessageBroker.Consumers
         private readonly IConnection _connection;
         private readonly IModel _channel;
         private readonly string _queueName;
-        private readonly IServiceScopeFactory _serviceScopeFactory;
+        private readonly IStockQuoteResponseSender _sender;
         private readonly ILogger<StockQuoteRespondedConsumer> _logger;
 
         public StockQuoteRespondedConsumer(IOptions<MessageBrokerSettings> settings,
-            IServiceScopeFactory serviceScopeFactory,
+            IStockQuoteResponseSender sender,
             ILogger<StockQuoteRespondedConsumer> logger)
         {
             _settings = settings.Value;
-            _serviceScopeFactory = serviceScopeFactory;
+            _sender = sender;
             _logger = logger;
             var factory = new ConnectionFactory { HostName = _settings.Host, Port = _settings.Port };
             _connection = factory.CreateConnection();
@@ -55,9 +52,7 @@ namespace ChatApp.Api.MessageBroker.Consumers
                 var message = Encoding.UTF8.GetString(body.ToArray());
                 _logger.LogInformation("Stock quote response consumed: {Message}", message);
                 var stockQuoteResponded = JsonSerializer.Deserialize<StockQuoteResponded>(message);
-                using var scope = _serviceScopeFactory.CreateScope();
-                var sender = scope.ServiceProvider.GetRequiredService<IStockQuoteResponseSender>();
-                sender.Send(stockQuoteResponded);
+                _sender.Send(stockQuoteResponded);
             };
 
             _channel.BasicConsume(queue: _queueName, autoAck: true, consumer: consumer);

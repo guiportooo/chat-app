@@ -6,7 +6,6 @@ namespace ChatApp.Api.Domain.Services
     {
         public static IServiceCollection AddDomainServices(this IServiceCollection services) =>
             services
-                .AddScoped<IChatCommandParser, ChatCommandParser>()
-                .AddScoped<IStockQuoteResponseSender, StockQuoteResponseSender>();
+                .AddScoped<IChatCommandParser, ChatCommandParser>();
     }
 }

@@ -5,9 +5,7 @@ namespace ChatApp.Api.Domain.Commands
     using Events;
     using Exceptions;
     using MediatR;
-    using Microsoft.Extensions.Logging;
     using Models;
-    using Queries;
     using Repositories;
     using Services;
 

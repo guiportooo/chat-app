@@ -2,9 +2,9 @@ namespace ChatApp.StockBot.Services
 {
     using System.Threading.Tasks;
     using HttpOut;
-    using MessageBroker.Consumers.IntegrationEvents;
-    using MessageBroker.Publishers;
-    using MessageBroker.Publishers.IntegrationEvents;
+    using IntegrationEvents.Consumers;
+    using IntegrationEvents.Publishers;
+    using IStockQuoteRespondedPublisher = MessageBroker.Publishers.IStockQuoteRespondedPublisher;
 
     public interface IStockQuoteService
     {

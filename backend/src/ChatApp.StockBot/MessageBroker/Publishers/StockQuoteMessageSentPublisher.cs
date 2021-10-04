@@ -2,7 +2,7 @@ namespace ChatApp.StockBot.MessageBroker.Publishers
 {
     using System.Text;
     using System.Text.Json;
-    using IntegrationEvents;
+    using IntegrationEvents.Publishers;
     using Microsoft.Extensions.Logging;
     using Microsoft.Extensions.Options;
     using RabbitMQ.Client;
