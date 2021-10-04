@@ -41,8 +41,7 @@ namespace ChatApp.Api.Domain.Commands
             var @event = new MessageSent(message.Text, message.Timestamp, userName, roomCode);
             await _mediator.Publish(@event, cancellationToken);
 
-            if (_commandParser.IsCommand(text) || user.IsBot)
-                return null;
+            if (!message.ShouldBeSaved) return null;
 
             await _messageRepository.Add(message);
             return message;

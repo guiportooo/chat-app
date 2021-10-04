@@ -11,14 +11,6 @@ namespace ChatApp.UnitTests.Api.Domain.Services
         [SetUp]
         public void Setup() => _parser = new ChatCommandParser();
 
-        [TestCase("/stock=APPL.US", true)]
-        [TestCase("/stock=APPL=US", true)]
-        [TestCase("/stock=APPL/US", true)]
-        [TestCase("stock=APPL.US", false)]
-        [TestCase("/stock>APPL.US", false)]
-        public void Should_identify_valid_command(string text, bool isCommand) =>
-            _parser.IsCommand(text).Should().Be(isCommand);
-
         [TestCase("/stock=APPL.US", "/stock", "APPL.US")]
         [TestCase("/stock=APPL=US", "/stock", "APPL=US")]
         [TestCase("/stock=APPL/US", "/stock", "APPL/US")]

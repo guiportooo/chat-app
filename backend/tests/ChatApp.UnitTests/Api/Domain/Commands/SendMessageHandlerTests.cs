@@ -7,7 +7,6 @@ namespace ChatApp.UnitTests.Api.Domain.Commands
     using ChatApp.Api.Domain.Commands;
     using ChatApp.Api.Domain.Models;
     using ChatApp.Api.Domain.Repositories;
-    using ChatApp.Api.Domain.Services;
     using FluentAssertions;
     using Moq;
     using Moq.AutoMock;
@@ -28,7 +27,9 @@ namespace ChatApp.UnitTests.Api.Domain.Commands
         [Test]
         public async Task Should_not_save_message_to_the_database_when_message_is_a_command()
         {
-            var command = new AutoFaker<SendMessage>().Generate();
+            var command = new AutoFaker<SendMessage>()
+                .RuleFor(x => x.Text, () => "/stock=APPL.US")
+                .Generate();
             var room = new AutoFaker<Room>().Generate();
             var user = new AutoFaker<User>().Generate();
 
@@ -41,11 +42,6 @@ namespace ChatApp.UnitTests.Api.Domain.Commands
                 .GetMock<IUserRepository>()
                 .Setup(x => x.GetByUserName(command.UserName))
                 .ReturnsAsync(user);
-
-            _mocker
-                .GetMock<IChatCommandParser>()
-                .Setup(x => x.IsCommand(command.Text))
-                .Returns(true);
 
             var message = await _handler.Handle(command, CancellationToken.None);
 
@@ -68,11 +64,6 @@ namespace ChatApp.UnitTests.Api.Domain.Commands
                 .GetMock<IRoomRepository>()
                 .Setup(x => x.GetByCode(command.RoomCode))
                 .ReturnsAsync(room);
-
-            _mocker
-                .GetMock<IChatCommandParser>()
-                .Setup(x => x.IsCommand(command.Text))
-                .Returns(false);
 
             var message = await _handler.Handle(command, CancellationToken.None);
 
@@ -101,11 +92,6 @@ namespace ChatApp.UnitTests.Api.Domain.Commands
                 .GetMock<IUserRepository>()
                 .Setup(x => x.GetByUserName(command.UserName))
                 .ReturnsAsync(user);
-
-            _mocker
-                .GetMock<IChatCommandParser>()
-                .Setup(x => x.IsCommand(command.Text))
-                .Returns(false);
 
             var message = await _handler.Handle(command, CancellationToken.None);
 

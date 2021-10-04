@@ -1,6 +1,7 @@
 namespace ChatApp.Api.Domain.Models
 {
     using System;
+    using System.Text.RegularExpressions;
 
     public class Message
     {
@@ -16,10 +17,8 @@ namespace ChatApp.Api.Domain.Models
         {
             Timestamp = DateTime.UtcNow;
             Text = text;
-            RoomId = room.Id;
-
-            if (user.IsBot) User = user;
-            else UserId = user.Id;
+            Room = room;
+            User = user;
         }
 
         public int Id { get; private set; }
@@ -29,5 +28,7 @@ namespace ChatApp.Api.Domain.Models
         public Room Room { get; private set; } = null!;
         public int UserId { get; private set; }
         public User User { get; private set; } = null!;
+        public bool ShouldBeSaved => !IsCommand && !User.IsBot;
+        private bool IsCommand => new Regex("/[a-zA-Z]+=.+", RegexOptions.IgnoreCase).IsMatch(Text);
     }
 }

@@ -8,7 +8,6 @@ namespace ChatApp.IntegrationTests.Api.Controllers
     using System.Threading.Tasks;
     using AutoBogus;
     using ChatApp.Api.Domain.Services;
-    using ChatApp.Api.HttpIn.Authentication;
     using FluentAssertions;
     using FluentAssertions.Json;
     using Microsoft.EntityFrameworkCore;

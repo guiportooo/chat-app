@@ -27,41 +27,18 @@ namespace ChatApp.UnitTests.Api.Domain.EventHandlers.StockBot
         }
 
         [Test]
-        public async Task Should_ignore_when_message_sent_is_not_a_command()
+        public async Task Should_not_publish_command_when_message_is_not_a_command()
         {
-            var messageSent = new AutoFaker<MessageSent>().Generate();
-
-            _mocker
-                .GetMock<IChatCommandParser>()
-                .Setup(x => x.IsCommand(messageSent.Text))
-                .Returns(false);
-
-            await _handler.Handle(messageSent, CancellationToken.None);
-
-            _mocker
-                .GetMock<IStockQuoteRequestedPublisher>()
-                .Verify(x => x.Publish(It.IsAny<StockQuoteRequested>()), Times.Never);
-        }
-
-        [Test]
-        public void Should_throw_exception_when_command_is_invalid()
-        {
-            var messageSent = new AutoFaker<MessageSent>().Generate();
-
-            _mocker
-                .GetMock<IChatCommandParser>()
-                .Setup(x => x.IsCommand(messageSent.Text))
-                .Returns(true);
+            var messageSent = new AutoFaker<MessageSent>()
+                .RuleFor(x => x.Text, () => "not.a.command")
+                .Generate();
 
             _mocker
                 .GetMock<IChatCommandParser>()
                 .Setup(x => x.Parse(messageSent.Text))
                 .Returns(("", ""));
 
-            Func<Task> handle = async () => await _handler.Handle(messageSent, CancellationToken.None);
-
-            handle.Should().Throw<InvalidChatCommandException>()
-                .WithMessage($"Chat command {messageSent.Text} is invalid");
+            await _handler.Handle(messageSent, CancellationToken.None);
 
             _mocker
                 .GetMock<IStockQuoteRequestedPublisher>()
@@ -83,11 +60,6 @@ namespace ChatApp.UnitTests.Api.Domain.EventHandlers.StockBot
 
             var commandPublished = new StockQuoteRequested("", "");
             var expectedCommandPublished = new StockQuoteRequested(value, roomCode);
-
-            _mocker
-                .GetMock<IChatCommandParser>()
-                .Setup(x => x.IsCommand(text))
-                .Returns(true);
 
             _mocker
                 .GetMock<IChatCommandParser>()

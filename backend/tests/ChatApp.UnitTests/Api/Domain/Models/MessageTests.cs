@@ -28,33 +28,57 @@ namespace ChatApp.UnitTests.Api.Domain.Models
         {
             const string text = "Hello World!";
             var room = new AutoFaker<Room>().Generate();
+            var user = new AutoFaker<User>().Generate();
+
+            var message = new Message(text, room, user);
+
+            message.Text.Should().Be(text);
+            message.User.Should().BeEquivalentTo(user);
+            message.Room.Should().BeEquivalentTo(room);
+            message.Timestamp.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(2));
+        }
+
+        [TestCase("/stock=APPL.US", false)]
+        [TestCase("/stock=APPL=US", false)]
+        [TestCase("/stock=APPL/US", false)]
+        [TestCase("stock=APPL.US", true)]
+        [TestCase("/stock>APPL.US", true)]
+        public void Should_not_be_saved_when_is_a_command_and_user_is_not_a_bot(string text, bool shouldBeSaved)
+        {
+            var room = new AutoFaker<Room>().Generate();
             var user = new AutoFaker<User>()
                 .RuleFor(x => x.UserName, () => "not.a.bot")
                 .Generate();
 
             var message = new Message(text, room, user);
 
-            message.Text.Should().Be(text);
-            message.RoomId.Should().Be(room.Id);
-            message.UserId.Should().Be(user.Id);
-            message.User.Should().BeNull();
-            message.Timestamp.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(2));
+            message.ShouldBeSaved.Should().Be(shouldBeSaved);
         }
 
         [Test]
-        public void Should_create_message_when_user_is_bot()
+        public void Should_not_be_saved_when_is_not_a_command_and_user_is_a_bot()
         {
-            const string text = "Hello World!";
+            const string text = "not.a.command";
             var room = new AutoFaker<Room>().Generate();
             var user = new StockBotUser();
 
             var message = new Message(text, room, user);
 
-            message.Text.Should().Be(text);
-            message.RoomId.Should().Be(room.Id);
-            message.UserId.Should().Be(0);
-            message.User.Should().Be(user);
-            message.Timestamp.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(2));
+            message.ShouldBeSaved.Should().Be(false);
+        }
+
+        [Test]
+        public void Should_be_saved_when_is_not_a_command_and_user_is_not_a_bot()
+        {
+            const string text = "not.a.command";
+            var room = new AutoFaker<Room>().Generate();
+            var user = new AutoFaker<User>()
+                .RuleFor(x => x.UserName, () => "not.a.bot")
+                .Generate();
+
+            var message = new Message(text, room, user);
+
+            message.ShouldBeSaved.Should().Be(true);
         }
     }
 }

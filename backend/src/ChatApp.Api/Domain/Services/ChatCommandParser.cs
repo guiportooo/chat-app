@@ -4,14 +4,11 @@ namespace ChatApp.Api.Domain.Services
 
     public interface IChatCommandParser
     {
-        bool IsCommand(string text);
         (string command, string value) Parse(string text);
     }
 
     public class ChatCommandParser : IChatCommandParser
     {
-        public bool IsCommand(string text) => new Regex("/[a-zA-Z]+=.+", RegexOptions.IgnoreCase).IsMatch(text);
-
         public (string, string) Parse(string text)
         {
             if (!IsCommand(text))
@@ -20,5 +17,7 @@ namespace ChatApp.Api.Domain.Services
             var index = text.IndexOf('=');
             return (text[..index], text[^(text.Length - index - 1)..]);
         }
+
+        private static bool IsCommand(string text) => new Regex("/[a-zA-Z]+=.+", RegexOptions.IgnoreCase).IsMatch(text);
     }
 }
