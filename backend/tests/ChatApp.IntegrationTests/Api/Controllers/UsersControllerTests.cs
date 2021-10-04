@@ -7,9 +7,12 @@ namespace ChatApp.IntegrationTests.Api.Controllers
     using System.Text.Json;
     using System.Threading.Tasks;
     using AutoBogus;
+    using ChatApp.Api.Domain.Services;
+    using ChatApp.Api.HttpIn.Authentication;
     using FluentAssertions;
     using FluentAssertions.Json;
     using Microsoft.EntityFrameworkCore;
+    using Microsoft.Extensions.DependencyInjection;
     using Newtonsoft.Json.Linq;
     using NUnit.Framework;
     using Requests = ChatApp.Api.HttpIn.Requests;
@@ -123,12 +126,16 @@ namespace ChatApp.IntegrationTests.Api.Controllers
 
         [TestCase("majestic.hippo", "incorrect.password"), Category("AuthenticateUser")]
         [TestCase("incorrect.username", "pass@123"), Category("AuthenticateUser")]
-        public async Task Should_return_not_found_when_users_information_is_invalid(string userName, string password)
+        public async Task Should_return_unauthorized_when_users_information_is_invalid(string userName, string password)
         {
+            var passwordHasher = Scope.ServiceProvider.GetRequiredService<IPasswordHasher>();
+            const string correctPassword = "pass@123";
+            var protectedPassword = passwordHasher.Hash(correctPassword);
+            
             var user = new AutoFaker<Models.User>()
                 .RuleFor(x => x.Id, () => 0)
                 .RuleFor(x => x.UserName, () => "majestic.hippo")
-                .RuleFor(x => x.Password, () => "pass@123")
+                .RuleFor(x => x.Password, () => protectedPassword)
                 .Generate();
 
             DbContext.Users.Add(user);
@@ -145,14 +152,19 @@ namespace ChatApp.IntegrationTests.Api.Controllers
 
             var response = await HttpClient.PostAsync("authenticate", requestContent);
 
-            response.StatusCode.Should().Be(HttpStatusCode.NotFound);
+            response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
         }
 
         [Test, Category("AuthenticateUser")]
         public async Task Should_return_valid_token_when_users_information_is_valid()
         {
+            var passwordHasher = Scope.ServiceProvider.GetRequiredService<IPasswordHasher>();
+            const string password = "pass@123";
+            var protectedPassword = passwordHasher.Hash(password);
+            
             var user = new AutoFaker<Models.User>()
                 .RuleFor(x => x.Id, () => 0)
+                .RuleFor(x => x.Password, () => protectedPassword)
                 .Generate();
 
             DbContext.Users.Add(user);
@@ -160,7 +172,7 @@ namespace ChatApp.IntegrationTests.Api.Controllers
 
             var authRequest = new AutoFaker<Requests.AuthenticateUser>()
                 .RuleFor(x => x.UserName, () => user.UserName)
-                .RuleFor(x => x.Password, () => user.Password)
+                .RuleFor(x => x.Password, () => password)
                 .Generate();
 
             var authRequestContent = new StringContent(JsonSerializer.Serialize(authRequest),

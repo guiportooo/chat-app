@@ -4,7 +4,6 @@ namespace ChatApp.Api
     using Requests = HttpIn.Requests;
     using Responses = HttpIn.Responses;
     using Commands = Domain.Commands;
-    using Queries = Domain.Queries;
     using Models = Domain.Models;
     using Events = Domain.Events;
     using Consumers = Domain.IntegrationEvents.Consumers;
@@ -17,7 +16,6 @@ namespace ChatApp.Api
             CreateMap<Commands.RegisterUser, Models.User>();
             CreateMap<Models.User, Responses.User>();
             CreateMap<Requests.AuthenticateUser, Commands.AuthenticateUser>();
-            CreateMap<Commands.AuthenticateUser, Queries.GetUserByUserNameAndPassword>();
             CreateMap<Models.Message, Responses.MessageSent>();
             CreateMap<Models.Message, Responses.Message>();
             CreateMap<Models.Message, Events.MessageSent>();

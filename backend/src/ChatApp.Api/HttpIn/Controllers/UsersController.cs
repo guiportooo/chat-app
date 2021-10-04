@@ -54,14 +54,13 @@
         [HttpPost]
         [Route("authenticate")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Responses.AuthenticatedUser))]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Authenticate([FromBody] Requests.AuthenticateUser request)
         {
             var command = _mapper.Map<Commands.AuthenticateUser>(request);
             var token = await _mediator.Send(command);
 
             if (string.IsNullOrWhiteSpace(token))
-                return NotFound();
+                return Unauthorized();
 
             var response = new Responses.AuthenticatedUser(request.UserName, token);
             return Ok(response);

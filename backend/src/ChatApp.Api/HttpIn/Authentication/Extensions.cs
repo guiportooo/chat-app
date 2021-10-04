@@ -1,6 +1,7 @@
 namespace ChatApp.Api.HttpIn.Authentication
 {
     using System.Text;
+    using Domain.Services;
     using Microsoft.AspNetCore.Authentication.JwtBearer;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
@@ -13,6 +14,7 @@ namespace ChatApp.Api.HttpIn.Authentication
             services
                 .Configure<AuthenticationSettings>(configuration.GetSection(AuthenticationSettings.Name))
                 .AddScoped<ITokenGenerator, TokenGenerator>()
+                .AddScoped<IPasswordHasher, PasswordHasher>()
                 .AddAuthentication(opt =>
                 {
                     opt.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;

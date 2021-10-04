@@ -5,8 +5,6 @@ namespace ChatApp.Api.MessageBroker.Consumers
     using System.Threading;
     using System.Threading.Tasks;
     using Domain.IntegrationEvents.Consumers;
-    using Domain.Services;
-    using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Hosting;
     using Microsoft.Extensions.Logging;
     using Microsoft.Extensions.Options;
