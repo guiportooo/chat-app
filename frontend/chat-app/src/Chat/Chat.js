@@ -40,13 +40,19 @@ const Chat = () => {
     }
 
     try {
-      await fetch('https://localhost:5001/register', {
+      const response = await fetch('https://localhost:5001/register', {
         method: 'POST',
         body: JSON.stringify(registerUser),
         headers: {
           'Content-Type': 'application/json',
         },
       })
+
+      if (response.ok) {
+        alert(`${userName} registered.`)
+      } else {
+        alert('Registering failed.')
+      }
     } catch (e) {
       console.log('Registering failed.', e)
     }
@@ -66,8 +72,14 @@ const Chat = () => {
           'Content-Type': 'application/json',
         },
       })
-      var authenticatedUser = await response.json()
-      setToken(authenticatedUser.token)
+
+      if (response.ok) {
+        var authenticatedUser = await response.json()
+        setToken(authenticatedUser.token)
+        alert(`${userName} logged in.`)
+      } else {
+        alert('Login failed.')
+      }
     } catch (e) {
       console.log('Login failed.', e)
     }
