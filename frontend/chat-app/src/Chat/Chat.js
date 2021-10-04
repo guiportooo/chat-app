@@ -6,7 +6,7 @@ import ChatInput from './ChatInput'
 import ChatWindow from './ChatWindow'
 
 const Chat = () => {
-  const [token, setToken] = useState('')
+  const [token, setToken] = useState(null)
   const [chat, setChat] = useState([])
   const latestChat = useRef(null)
 
@@ -25,13 +25,32 @@ const Chat = () => {
 
         connection.on('ReceiveMessage', (message) => {
           const updatedChat = [...latestChat.current]
-          updatedChat.push(message)
+          updatedChat.unshift(message)
 
           setChat(updatedChat)
         })
       })
       .catch((e) => console.log('Connection failed: ', e))
   }, [])
+
+  const register = async (userName, password) => {
+    const registerUser = {
+      userName: userName,
+      password: password,
+    }
+
+    try {
+      await fetch('https://localhost:5001/register', {
+        method: 'POST',
+        body: JSON.stringify(registerUser),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+    } catch (e) {
+      console.log('Registering failed.', e)
+    }
+  }
 
   const logIn = async (userName, password) => {
     const authenticateUser = {
@@ -54,24 +73,37 @@ const Chat = () => {
     }
   }
 
-  const register = async (userName, password) => {
-    const registerUser = {
-      userName: userName,
-      password: password,
-    }
+  useEffect(() => {
+    if (token) {
+      const fetchData = async () => {
+        try {
+          const response = await fetch(
+            'https://localhost:5001/rooms/general/messages',
+            {
+              method: 'GET',
+              headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          )
 
-    try {
-      await fetch('https://localhost:5001/register', {
-        method: 'POST',
-        body: JSON.stringify(registerUser),
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      })
-    } catch (e) {
-      console.log('Registering failed.', e)
+          var content = await response.json()
+          var messages = content.messages
+
+          const updatedChat = [...latestChat.current]
+          messages.map((message) => updatedChat.push(message))
+
+          setChat(updatedChat)
+        } catch (e) {
+          console.log('Retrieving messages failed.', e)
+        }
+      }
+
+      fetchData().catch(console.error)
     }
-  }
+  }, [token])
+
   const sendMessage = async (message) => {
     const chatMessage = {
       text: message,
@@ -89,7 +121,6 @@ const Chat = () => {
           },
         }
       )
-      console.log('sendMessageResponse', await response.json())
     } catch (e) {
       console.log('Sending message failed.', e)
     }
@@ -97,7 +128,7 @@ const Chat = () => {
 
   return (
     <div>
-      {token.length > 0 ? (
+      {token ? (
         <div>
           <ChatInput sendMessage={sendMessage} />
           <hr />
