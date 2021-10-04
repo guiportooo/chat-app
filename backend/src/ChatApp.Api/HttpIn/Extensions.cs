@@ -8,6 +8,7 @@ namespace ChatApp.Api.HttpIn
     using Microsoft.Extensions.Hosting;
     using Microsoft.OpenApi.Models;
     using Middlewares;
+    using WebSocket;
 
     public static class Extensions
     {
@@ -41,6 +42,16 @@ namespace ChatApp.Api.HttpIn
                     });
                 })
                 .AddBearerAuthentication(configuration)
+                .AddCors(options =>
+                {
+                    options.AddPolicy("ClientPermission", policy =>
+                    {
+                        policy.AllowAnyHeader()
+                            .AllowAnyMethod()
+                            .WithOrigins("http://localhost:3000")
+                            .AllowCredentials();
+                    });
+                })
                 .AddControllers()
                 .Services;
 
@@ -56,11 +67,16 @@ namespace ChatApp.Api.HttpIn
 
             return app
                 .UseHttpsRedirection()
+                .UseCors("ClientPermission")
                 .UseRouting()
                 .UseAuthentication()
                 .UseAuthorization()
                 .UseMiddleware<DomainExceptionMiddleware>()
-                .UseEndpoints(endpoints => endpoints.MapControllers());
+                .UseEndpoints(endpoints =>
+                {
+                    endpoints.MapControllers();
+                    endpoints.MapHub<ChatHub>("/hubs/chat");
+                });
         }
     }
 }
