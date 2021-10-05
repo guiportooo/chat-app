@@ -1,73 +1,42 @@
 namespace ChatApp.Api.MessageBroker.Consumers
 {
-    using System.Text;
-    using System.Text.Json;
-    using System.Threading;
+    using System;
     using System.Threading.Tasks;
+    using AutoMapper;
+    using Domain.Commands;
     using Domain.IntegrationEvents.Consumers;
-    using Microsoft.Extensions.Hosting;
+    using Domain.Models;
+    using MediatR;
+    using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Logging;
     using Microsoft.Extensions.Options;
-    using RabbitMQ.Client;
-    using RabbitMQ.Client.Events;
-    using Services;
 
-    public class StockQuoteRespondedConsumer : BackgroundService
+    public class StockQuoteRespondedConsumer : Consumer<StockQuoteResponded>
     {
-        private readonly MessageBrokerSettings _settings;
-        private readonly IConnection _connection;
-        private readonly IModel _channel;
-        private readonly string _queueName;
-        private readonly IStockQuoteResponseSender _sender;
-        private readonly ILogger<StockQuoteRespondedConsumer> _logger;
+        private readonly IServiceScopeFactory _serviceScopeFactory;
 
         public StockQuoteRespondedConsumer(IOptions<MessageBrokerSettings> settings,
-            IStockQuoteResponseSender sender,
-            ILogger<StockQuoteRespondedConsumer> logger)
+            ILogger<StockQuoteRespondedConsumer> logger,
+            IServiceScopeFactory serviceScopeFactory)
+            : base(settings, logger) =>
+            _serviceScopeFactory = serviceScopeFactory;
+
+        public override async Task Consume(StockQuoteResponded @event)
         {
-            _settings = settings.Value;
-            _sender = sender;
-            _logger = logger;
-            var factory = new ConnectionFactory { HostName = _settings.Host, Port = _settings.Port };
-            _connection = factory.CreateConnection();
-            _channel = _connection.CreateModel();
-            _channel.ExchangeDeclare(exchange: _settings.BrokerName, type: ExchangeType.Direct);
-            _queueName = _channel.QueueDeclare().QueueName;
-            _connection.ConnectionShutdown += RabbitMQ_ConnectionShutdown;
-        }
+            using var scope = _serviceScopeFactory.CreateScope();
+            var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
 
-        protected override Task ExecuteAsync(CancellationToken stoppingToken)
-        {
-            stoppingToken.ThrowIfCancellationRequested();
-            _channel.QueueBind(queue: _queueName,
-                exchange: _settings.BrokerName,
-                routingKey: nameof(StockQuoteResponded));
+            if (mapper is null)
+                throw new ArgumentNullException(nameof(mapper), "Could not instantiate Mapper");
 
-            var consumer = new EventingBasicConsumer(_channel);
-            consumer.Received += (_, eventArgs) =>
-            {
-                var body = eventArgs.Body;
-                var message = Encoding.UTF8.GetString(body.ToArray());
-                _logger.LogInformation("Stock quote response consumed: {Message}", message);
-                var stockQuoteResponded = JsonSerializer.Deserialize<StockQuoteResponded>(message);
-                _sender.Send(stockQuoteResponded);
-            };
+            var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
 
-            _channel.BasicConsume(queue: _queueName, autoAck: true, consumer: consumer);
-            return Task.CompletedTask;
-        }
+            if (mediator is null)
+                throw new ArgumentNullException(nameof(mediator), "Could not instantiate Mediator");
 
-        private void RabbitMQ_ConnectionShutdown(object? sender, ShutdownEventArgs e) =>
-            _logger.LogInformation("--> RabbitMQ Connection Shutdown");
-
-        public override void Dispose()
-        {
-            if (!_channel.IsOpen)
-                return;
-
-            _channel.Close();
-            _connection.Close();
-            base.Dispose();
+            @event.UserName = StockBotUser.BotUserName;
+            var command = mapper.Map<SendMessage>(@event);
+            await mediator.Send(command);
         }
     }
 }
