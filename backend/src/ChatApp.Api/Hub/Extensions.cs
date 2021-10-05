@@ -1,13 +1,13 @@
-namespace ChatApp.Api.WebSocket
+namespace ChatApp.Api.Hub
 {
     using Domain.IntegrationEvents.Hub;
     using Microsoft.Extensions.DependencyInjection;
 
     public static class Extensions
     {
-        public static IServiceCollection AddWebSocket(this IServiceCollection services) =>
+        public static IServiceCollection AddHub(this IServiceCollection services) =>
             services
-                .AddScoped<IHub, Hub>()
+                .AddScoped<IHub, ChatHub>()
                 .AddSignalR()
                 .Services;
     }

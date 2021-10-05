@@ -1,4 +1,4 @@
-namespace ChatApp.Api.WebSocket
+namespace ChatApp.Api.Hub
 {
     using System.Threading.Tasks;
     using Domain.Events;

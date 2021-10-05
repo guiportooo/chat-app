@@ -2,6 +2,7 @@ namespace ChatApp.Api
 {
     using Domain.Services;
     using HttpIn;
+    using Hub;
     using MediatR;
     using MessageBroker;
     using Microsoft.AspNetCore.Builder;
@@ -9,7 +10,6 @@ namespace ChatApp.Api
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
     using Storage;
-    using WebSocket;
 
     public class Startup
     {
@@ -24,7 +24,7 @@ namespace ChatApp.Api
                 .AddDomainServices()
                 .AddStorage(_configuration)
                 .AddMessageBroker(_configuration)
-                .AddWebSocket()
+                .AddHub()
                 .AddHttpIn(_configuration);
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env) =>

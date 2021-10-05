@@ -1,4 +1,4 @@
-namespace ChatApp.Api.WebSocket
+namespace ChatApp.Api.Hub
 {
     using System.Threading.Tasks;
     using Domain.Events;
@@ -6,12 +6,12 @@ namespace ChatApp.Api.WebSocket
     using Microsoft.AspNetCore.SignalR;
     using Microsoft.Extensions.Logging;
 
-    public class Hub : IHub
+    public class ChatHub : IHub
     {
-        private readonly IHubContext<ChatHub, IChatClient> _chatHub;
-        private readonly ILogger<Hub> _logger;
+        private readonly IHubContext<SignalRHub, IChatClient> _chatHub;
+        private readonly ILogger<ChatHub> _logger;
 
-        public Hub(IHubContext<ChatHub, IChatClient> chatHub, ILogger<Hub> logger)
+        public ChatHub(IHubContext<SignalRHub, IChatClient> chatHub, ILogger<ChatHub> logger)
         {
             _chatHub = chatHub;
             _logger = logger;
