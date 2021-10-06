@@ -34,7 +34,7 @@ namespace ChatApp.Api.MessageBroker.Publishers
                 routingKey: @event.GetType().Name,
                 basicProperties: null,
                 body: body);
-            _logger.LogInformation("Publishing stock quote request: {Message}", message);
+            _logger.LogInformation("Publishing {Type}: {Message}", typeof(T).Name, message);
         }
 
         private void RabbitMQ_ConnectionShutdown(object? sender, ShutdownEventArgs e) =>

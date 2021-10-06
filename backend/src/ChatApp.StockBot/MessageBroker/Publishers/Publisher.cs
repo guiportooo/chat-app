@@ -3,23 +3,19 @@ namespace ChatApp.StockBot.MessageBroker.Publishers
     using System.Text;
     using System.Text.Json;
     using IntegrationEvents.Publishers;
+    using MessageBroker;
     using Microsoft.Extensions.Logging;
     using Microsoft.Extensions.Options;
     using RabbitMQ.Client;
 
-    public interface IStockQuoteRespondedPublisher : IPublisher<StockQuoteResponded>
-    {
-    }
-
-    public class StockQuoteRespondedPublisher : IStockQuoteRespondedPublisher
+    public class Publisher<T> : IPublisher<T> where T : IntegrationEvent
     {
         private readonly MessageBrokerSettings _settings;
         private readonly IConnection _connection;
         private readonly IModel _channel;
-        private readonly ILogger<StockQuoteRespondedPublisher> _logger;
+        private readonly ILogger<Publisher<T>> _logger;
 
-        public StockQuoteRespondedPublisher(IOptions<MessageBrokerSettings> settings,
-            ILogger<StockQuoteRespondedPublisher> logger)
+        public Publisher(IOptions<MessageBrokerSettings> settings, ILogger<Publisher<T>> logger)
         {
             _settings = settings.Value;
             _logger = logger;
@@ -30,7 +26,7 @@ namespace ChatApp.StockBot.MessageBroker.Publishers
             _connection.ConnectionShutdown += RabbitMQ_ConnectionShutdown;
         }
 
-        public void Publish(StockQuoteResponded @event)
+        public void Publish(T @event)
         {
             var message = JsonSerializer.Serialize(@event);
             var body = Encoding.UTF8.GetBytes(message);
@@ -38,7 +34,7 @@ namespace ChatApp.StockBot.MessageBroker.Publishers
                 routingKey: @event.GetType().Name,
                 basicProperties: null,
                 body: body);
-            _logger.LogInformation("Publishing stock quote response: {Message}", message);
+            _logger.LogInformation("Publishing {Type}: {Message}", typeof(T).Name, message);
         }
 
         private void RabbitMQ_ConnectionShutdown(object? sender, ShutdownEventArgs e) =>

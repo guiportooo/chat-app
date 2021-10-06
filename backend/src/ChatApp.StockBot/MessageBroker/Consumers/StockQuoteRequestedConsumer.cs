@@ -1,73 +1,31 @@
 namespace ChatApp.StockBot.MessageBroker.Consumers
 {
-    using System.Text;
-    using System.Text.Json;
-    using System.Threading;
+    using System;
     using System.Threading.Tasks;
     using IntegrationEvents.Consumers;
-    using Microsoft.Extensions.Hosting;
+    using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Logging;
     using Microsoft.Extensions.Options;
-    using RabbitMQ.Client;
-    using RabbitMQ.Client.Events;
     using Services;
 
-    public class StockQuoteRequestedConsumer : BackgroundService
+    public class StockQuoteRequestedConsumer : Consumer<StockQuoteRequested>
     {
-        private readonly MessageBrokerSettings _settings;
-        private readonly IConnection _connection;
-        private readonly IModel _channel;
-        private readonly string _queueName;
-        private readonly IStockQuoteService _service;
-        private readonly ILogger<StockQuoteRequestedConsumer> _logger;
+        private readonly IServiceScopeFactory _serviceScopeFactory;
 
         public StockQuoteRequestedConsumer(IOptions<MessageBrokerSettings> settings,
-            IStockQuoteService service,
-            ILogger<StockQuoteRequestedConsumer> logger)
+            ILogger<StockQuoteRequestedConsumer> logger,
+            IServiceScopeFactory serviceScopeFactory) : base(settings, logger) =>
+            _serviceScopeFactory = serviceScopeFactory;
+
+        public override async Task Consume(StockQuoteRequested @event)
         {
-            _settings = settings.Value;
-            _service = service;
-            _logger = logger;
-            var factory = new ConnectionFactory { HostName = _settings.Host, Port = _settings.Port };
-            _connection = factory.CreateConnection();
-            _channel = _connection.CreateModel();
-            _channel.ExchangeDeclare(exchange: _settings.BrokerName, type: ExchangeType.Direct);
-            _queueName = _channel.QueueDeclare().QueueName;
-            _connection.ConnectionShutdown += RabbitMQ_ConnectionShutdown;
-        }
+            using var scope = _serviceScopeFactory.CreateScope();
+            var service = scope.ServiceProvider.GetRequiredService<IStockQuoteService>();
 
-        protected override Task ExecuteAsync(CancellationToken stoppingToken)
-        {
-            stoppingToken.ThrowIfCancellationRequested();
-            _channel.QueueBind(queue: _queueName,
-                exchange: _settings.BrokerName,
-                routingKey: nameof(StockQuoteRequested));
+            if (service is null)
+                throw new ArgumentNullException(nameof(service), "Could not instantiate Mapper");
 
-            var consumer = new EventingBasicConsumer(_channel);
-            consumer.Received += (_, eventArgs) =>
-            {
-                var body = eventArgs.Body;
-                var message = Encoding.UTF8.GetString(body.ToArray());
-                _logger.LogInformation("Stock quote request consumed: {Message}", message);
-                var stockQuoteRequested = JsonSerializer.Deserialize<StockQuoteRequested>(message);
-                _service.SendStockQuote(stockQuoteRequested);
-            };
-
-            _channel.BasicConsume(queue: _queueName, autoAck: true, consumer: consumer);
-            return Task.CompletedTask;
-        }
-
-        private void RabbitMQ_ConnectionShutdown(object? sender, ShutdownEventArgs e) =>
-            _logger.LogInformation("--> RabbitMQ Connection Shutdown");
-
-        public override void Dispose()
-        {
-            if (!_channel.IsOpen)
-                return;
-
-            _channel.Close();
-            _connection.Close();
-            base.Dispose();
+            await service.SendStockQuote(@event);
         }
     }
 }

@@ -1,11 +1,11 @@
-namespace ChatApp.Api.MessageBroker.Consumers
+namespace ChatApp.StockBot.MessageBroker.Consumers
 {
     using System.Text;
     using System.Text.Json;
     using System.Threading;
     using System.Threading.Tasks;
-    using Domain.IntegrationEvents;
-    using Domain.IntegrationEvents.Consumers;
+    using IntegrationEvents.Consumers;
+    using MessageBroker;
     using Microsoft.Extensions.Hosting;
     using Microsoft.Extensions.Logging;
     using Microsoft.Extensions.Options;

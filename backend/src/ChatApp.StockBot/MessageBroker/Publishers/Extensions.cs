@@ -1,5 +1,6 @@
 namespace ChatApp.StockBot.MessageBroker.Publishers
 {
+    using IntegrationEvents.Publishers;
     using Microsoft.Extensions.DependencyInjection;
 
     public static class Extensions
