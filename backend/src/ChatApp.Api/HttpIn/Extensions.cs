@@ -1,6 +1,7 @@
 namespace ChatApp.Api.HttpIn
 {
     using Authentication;
+    using Hub;
     using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.Extensions.Configuration;
@@ -8,7 +9,6 @@ namespace ChatApp.Api.HttpIn
     using Microsoft.Extensions.Hosting;
     using Microsoft.OpenApi.Models;
     using Middlewares;
-    using WebSocket;
 
     public static class Extensions
     {
@@ -75,7 +75,7 @@ namespace ChatApp.Api.HttpIn
                 .UseEndpoints(endpoints =>
                 {
                     endpoints.MapControllers();
-                    endpoints.MapHub<ChatHub>("/hubs/chat");
+                    endpoints.MapHub<SignalRHub>("/hubs/chat");
                 });
         }
     }

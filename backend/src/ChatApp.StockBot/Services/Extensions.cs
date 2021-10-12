@@ -7,6 +7,6 @@ namespace ChatApp.StockBot.Services
         public static IServiceCollection AddBotServices(this IServiceCollection services) =>
             services
                 .AddSingleton<IStockQuoteCsvParser, StockQuoteParser>()
-                .AddSingleton<IStockQuoteService, StockQuoteService>();
+                .AddScoped<IStockQuoteService, StockQuoteService>();
     }
 }

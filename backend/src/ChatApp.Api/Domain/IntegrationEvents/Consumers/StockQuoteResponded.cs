@@ -1,8 +1,6 @@
 namespace ChatApp.Api.Domain.IntegrationEvents.Consumers
 {
-    using MediatR;
-
-    public class StockQuoteResponded : INotification
+    public class StockQuoteResponded : IntegrationEvent
     {
         public StockQuoteResponded(string text, string roomCode, string userName)
         {
